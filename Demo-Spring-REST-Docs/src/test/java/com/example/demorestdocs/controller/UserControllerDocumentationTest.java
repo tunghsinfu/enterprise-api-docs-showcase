@@ -107,7 +107,8 @@ class UserControllerDocumentationTest {
                                 fieldWithPath("error").description("錯誤訊息標題"),
                                 fieldWithPath("fieldErrors").description("各欄位的驗證錯誤明細"),
                                 fieldWithPath("fieldErrors.username").description("使用者名稱的驗證失敗原因"),
-                                fieldWithPath("fieldErrors.email").description("電子郵件的驗證失敗原因")
+                                fieldWithPath("fieldErrors.email").description("電子郵件的驗證失敗原因"),
+                                fieldWithPath("fieldErrors.birthday").description("生日的驗證失敗原因")
                         )
                 ));
     }
