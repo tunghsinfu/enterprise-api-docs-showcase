@@ -1,0 +1,51 @@
+jenkins:
+  systemMessage: "Demo Enterprise - API 自動化文件 CI/CD\n\n"
+  numExecutors: 2
+  mode: NORMAL
+  scmCheckoutRetryCount: 3
+  labelString: "docker maven linux"
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: admin
+          password: admin
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: false
+
+  remotingSecurity:
+    enabled: true
+
+tool:
+  jdk:
+    installations:
+      - name: "JDK-17"
+        properties:
+          - installSource:
+              installers:
+                - adoptium.net:
+                    id: jdk-17.0.14+7
+  maven:
+    installations:
+      - name: "Maven-3.9"
+        properties:
+          - installSource:
+              installers:
+                - maven:
+                    id: "3.9.9"
+
+unclassified:
+  location:
+    url: http://localhost/jenkins/
+    adminAddress: admin@example.com
+
+  globalViewConfiguration:
+    defaultViewName: "All"
+    defaultViewTabBarOnTop: true

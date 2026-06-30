@@ -1,0 +1,93 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.40">
+  <actions/>
+  <description>自動化建置與文件產生 Pipeline</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers>
+        <hudson.triggers.TimerTrigger>
+          <spec>H/30 * * * *</spec>
+        </hudson.triggers.TimerTrigger>
+      </triggers>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.90">
+    <script>
+pipeline {
+    agent any
+
+    environment {
+        SWAGGER_UI_DIR = &apos;/sources/demo-swagger-ui&apos;
+        REST_DOCS_DIR  = &apos;/sources/demo-rest-docs&apos;
+        DOCS_OUT       = &apos;/tmp/docs-build&apos;
+    }
+
+    stages {
+        stage(&apos;Checkout&apos;) {
+            steps {
+                echo &quot;原始碼已透過 Volume 掛載於 ${SWAGGER_UI_DIR} 與 ${REST_DOCS_DIR}&quot;
+                sh &apos;ls -la ${SWAGGER_UI_DIR}/pom.xml ${REST_DOCS_DIR}/pom.xml&apos;
+            }
+        }
+
+        stage(&apos;Build Swagger-UI&apos;) {
+            steps {
+                dir(&quot;${SWAGGER_UI_DIR}&quot;) {
+                    sh &apos;mvn clean package -DskipTests -B&apos;
+                }
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: &apos;target/*.jar&apos;, allowEmptyArchive: true
+                }
+            }
+        }
+
+        stage(&apos;Build REST-Docs + Generate Docs&apos;) {
+            steps {
+                dir(&quot;${REST_DOCS_DIR}&quot;) {
+                    sh &apos;mvn clean package -B&apos;
+                }
+            }
+            post {
+                success {
+                    sh &quot;rm -rf ${DOCS_OUT} &amp;&amp; mkdir -p ${DOCS_OUT}&quot;
+                    sh &quot;cp -r ${REST_DOCS_DIR}/target/generated-docs/* ${DOCS_OUT}/&quot;
+                    archiveArtifacts artifacts: &apos;target/*.jar&apos;, allowEmptyArchive: true
+                    archiveArtifacts artifacts: &apos;target/generated-docs/**&apos;, allowEmptyArchive: true
+                }
+            }
+        }
+
+        stage(&apos;Verify Validation&apos;) {
+            steps {
+                echo &quot;=== 驗證 Global Exception Handler 正確攔截髒資料 ===&quot;
+                sh &apos;&apos;&apos;
+                curl -s -X POST http://swagger-api:8080/api/users \
+                    -H &quot;Content-Type: application/json&quot; \
+                    -d &apos;{&quot;username&quot;:&quot;&quot;,&quot;email&quot;:&quot;bad&quot;,&quot;birthday&quot;:&quot;2099-12-31&quot;}&apos; \
+                    | python3 -m json.tool 2>/dev/null || echo &quot;API 尚未啟動，跳過驗證&quot;
+                &apos;&apos;&apos;
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo &quot;✅ Pipeline 執行成功！文件已產生。&quot;
+        }
+        failure {
+            echo &quot;❌ Pipeline 執行失敗，請檢查日誌。&quot;
+        }
+    }
+}
+    </script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

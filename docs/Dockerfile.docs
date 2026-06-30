@@ -1,0 +1,9 @@
+FROM maven:3.9-eclipse-temurin-17 AS builder
+WORKDIR /app
+COPY Demo-Spring-REST-Docs/pom.xml .
+RUN mvn dependency:go-offline -B
+COPY Demo-Spring-REST-Docs/src ./src
+RUN mvn package -B
+
+FROM nginx:alpine
+COPY --from=builder /app/target/generated-docs /usr/share/nginx/html

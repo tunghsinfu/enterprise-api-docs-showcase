@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Enterprise — 自動化 API 文件入口</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        h1 { font-size: 2.2rem; margin-bottom: .75rem; letter-spacing: .05em; }
+        .subtitle { color: #7f8c8d; margin-bottom: 2.5rem; font-size: 1rem; }
+        .cards { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); max-width: 1000px; width: 100%; }
+        .card {
+            background: #fff; border-radius: 12px; padding: 1.75rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,.06); transition: transform .2s, box-shadow .2s;
+            text-decoration: none; color: inherit; display: flex; flex-direction: column;
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+        .card .tag {
+            display: inline-block; font-size: .7rem; font-weight: 600; padding: .2rem .6rem;
+            border-radius: 4px; margin-bottom: .75rem; width: fit-content;
+        }
+        .tag.openapi { background: #e8f5e9; color: #2e7d32; }
+        .tag.restdocs { background: #e3f2fd; color: #1565c0; }
+        .tag.gateway { background: #fff3e0; color: #e65100; }
+        .tag.jenkins { background: #fce4ec; color: #c62828; }
+        .card h2 { font-size: 1.2rem; margin-bottom: .5rem; }
+        .card p { font-size: .9rem; color: #7f8c8d; line-height: 1.5; margin-bottom: .75rem; flex: 1; }
+        .card .url { font-family: "SFMono-Regular", Consolas, monospace; font-size: .8rem; color: #95a5a6; }
+        .footer { margin-top: 3rem; font-size: .8rem; color: #bdc3c7; text-align: center; }
+        .footer a { color: #3498db; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>API 自動化文件 &amp; 排障實踐</h1>
+    <p class="subtitle">Spring Boot 3.x · OpenAPI 3 · Spring REST Docs · Nginx · Jenkins</p>
+
+    <div class="cards">
+        <a class="card" href="/swagger-ui/index.html">
+            <span class="tag openapi">OpenAPI 3</span>
+            <h2>Swagger UI （互動式沙盒）</h2>
+            <p>代碼即文件（Annotation-Driven）。直接在瀏覽器上發送請求、測試 API、模擬髒資料輸入觀察防禦機制。</p>
+            <span class="url">/swagger-ui/index.html</span>
+        </a>
+
+        <a class="card" href="/docs/user-api.html">
+            <span class="tag restdocs">Spring REST Docs</span>
+            <h2>REST Docs 靜態文件</h2>
+            <p>測試驅動文件（Test-Driven）。100% 由測試案例產生，保證規格與實作完全一致。純靜態閱讀。</p>
+            <span class="url">/docs/user-api.html</span>
+        </a>
+
+        <a class="card" href="/api/users/1">
+            <span class="tag gateway">API Gateway</span>
+            <h2>統一路由入口</h2>
+            <p>所有 API 請求經 Nginx 進行路由，支援負載平衡、請求轉發，未來可擴充限流、鑑權等機制。</p>
+            <span class="url">/api/users/{id}</span>
+        </a>
+
+        <a class="card" href="/jenkins/">
+            <span class="tag jenkins">CI/CD</span>
+            <h2>Jenkins 流水線</h2>
+            <p>自動化建置與測試。當程式碼推送時自動觸發，執行 <code>mvn package</code>、產生文件、部署至文件伺服器。</p>
+            <span class="url">/jenkins/</span>
+        </a>
+    </div>
+
+    <div class="footer">
+        <p>原始碼位於 <a href="https://github.com/anomalyco/opencode">workspace</a> · Docker Compose 一鍵啟動</p>
+    </div>
+</body>
+</html>

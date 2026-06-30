@@ -1,0 +1,95 @@
+= 使用者管理 API 文件
+:doctype: book
+:source-highlighter: highlightjs
+:icons: font
+:toc: left
+:toclevels: 3
+:sectnums:
+
+本文件由 Spring REST Docs 自動產生，所有 API 請求和回應的範例均源自測試案例，確保留言即文件（\`code-as-documentation\`）。
+
+== 概述
+
+本 API 提供簡易的使用者管理功能，包含：
+
+- 建立使用者
+- 查詢使用者（依 ID）
+
+== 建立使用者
+
+=== 請求
+
+[source,http,options="nowrap"]
+----
+include::{snippets}/user/create/http-request.adoc[]
+----
+
+==== 請求欄位
+
+include::{snippets}/user/create/request-fields.adoc[]
+
+=== 回應
+
+==== 201 建立成功
+
+[source,http,options="nowrap"]
+----
+include::{snippets}/user/create/http-response.adoc[]
+----
+
+==== 回應欄位
+
+include::{snippets}/user/create/response-fields.adoc[]
+
+==== cURL 範例
+
+[source,bash,options="nowrap"]
+----
+include::{snippets}/user/create/curl-request.adoc[]
+----
+
+=== 參數驗證失敗（400）
+
+當傳入的資料不符合驗證規則時，會回傳 HTTP 400。
+
+[source,http,options="nowrap"]
+----
+include::{snippets}/user/create-validation-error/http-response.adoc[]
+----
+
+==== 錯誤回應欄位
+
+include::{snippets}/user/create-validation-error/response-fields.adoc[]
+
+== 查詢使用者
+
+=== 請求
+
+[source,http,options="nowrap"]
+----
+include::{snippets}/user/get/http-request.adoc[]
+----
+
+==== 路徑參數
+
+include::{snippets}/user/get/path-parameters.adoc[]
+
+=== 回應
+
+==== 200 查詢成功
+
+[source,http,options="nowrap"]
+----
+include::{snippets}/user/get/http-response.adoc[]
+----
+
+==== 回應欄位
+
+include::{snippets}/user/get/response-fields.adoc[]
+
+==== 404 使用者不存在
+
+[source,http,options="nowrap"]
+----
+include::{snippets}/user/get-not-found/http-response.adoc[]
+----

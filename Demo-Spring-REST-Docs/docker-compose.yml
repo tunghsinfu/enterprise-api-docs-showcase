@@ -1,0 +1,8 @@
+services:
+  demo-rest-docs:
+    build: .
+    container_name: demo-rest-docs
+    ports:
+      - "8080:8080"
+    environment:
+      - TZ=Asia/Taipei

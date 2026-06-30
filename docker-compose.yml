@@ -1,0 +1,96 @@
+services:
+
+  # ──────────────────────────────────────────────
+  # 1. OpenAPI 3 / Swagger UI 服務
+  #    代碼即文件，提供互動式 Swagger UI 沙盒
+  # ──────────────────────────────────────────────
+  swagger-api:
+    build:
+      context: ./Demo-Swagger-UI
+    container_name: demo-swagger-api
+    expose:
+      - "8080"
+    environment:
+      - TZ=${TZ}
+      - SPRING_SERVER_FORWARD_HEADERS_STRATEGY=framework
+    networks:
+      - demo-net
+
+  # ──────────────────────────────────────────────
+  # 2. Spring REST Docs API 服務
+  #    測試驅動文件，API 行為與文件 100% 一致
+  # ──────────────────────────────────────────────
+  restdocs-api:
+    build:
+      context: ./Demo-Spring-REST-Docs
+    container_name: demo-restdocs-api
+    expose:
+      - "8080"
+    environment:
+      - TZ=${TZ}
+    networks:
+      - demo-net
+
+  # ──────────────────────────────────────────────
+  # 3. REST Docs 靜態文件伺服器
+  #    在建構階段自動執行測試、產生 HTML 文件，
+  #    以獨立 Nginx 容器提供靜態檔案服務，
+  #    符合生產環境「業務邏輯與文件資產分離」原則
+  # ──────────────────────────────────────────────
+  restdocs-docs:
+    build:
+      context: ./
+      dockerfile: docs/Dockerfile.docs
+    container_name: demo-restdocs-docs
+    expose:
+      - "80"
+    networks:
+      - demo-net
+
+  # ──────────────────────────────────────────────
+  # 4. 統一 API Gateway（Nginx）
+  #    單一入口，負責路由、轉發、靜態文件提供
+  # ──────────────────────────────────────────────
+  gateway:
+    build: ./gateway
+    container_name: demo-gateway
+    ports:
+      - "80:80"
+    depends_on:
+      - swagger-api
+      - restdocs-api
+      - restdocs-docs
+    networks:
+      - demo-net
+
+  # ──────────────────────────────────────────────
+  # 5. Jenkins CI/CD 伺服器
+  #    自動化建置、測試、文件部署
+  # ──────────────────────────────────────────────
+  jenkins:
+    build: ./jenkins
+    container_name: demo-jenkins
+    ports:
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./Demo-Swagger-UI:/sources/demo-swagger-ui:ro
+      - ./Demo-Spring-REST-Docs:/sources/demo-rest-docs:ro
+    environment:
+      - TZ=${TZ}
+      - CASC_JENKINS_CONFIG=/var/jenkins_home/casc.yaml
+      - JENKINS_OPTS=--prefix=/jenkins -Djenkins.install.runSetupWizard=false
+    # 將 Jenkins 容器內的 jenkins 使用者加入 docker 群組
+    # 以取得 Docker daemon 操作權限 (GID 依主機環境可能不同)
+    group_add:
+      - "999"
+    networks:
+      - demo-net
+
+volumes:
+  jenkins_home:
+
+networks:
+  demo-net:
+    driver: bridge
